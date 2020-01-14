@@ -2,16 +2,17 @@ import time
 import serial
 import re
 
-from haversine import haversine
+from steGPS.haversine import haversine
 from threading import Thread
+from datetime import datetime, timedelta
 
 
 class Gps:
 
-    def __init__(self, serial_port, timezone=0, serial_baudrate=9600):
+    def __init__(self, serial_port, timezone_hours: int = 0, serial_baudrate: int = 9600):
         self.serial_ = serial.Serial(serial_port, serial_baudrate)
         # self.file = open("aaa.txt", "a+")
-
+        self.timezone_offset = timedelta(hours=timezone_hours)
         self.quality_ = 0  # 0 not fixed / 1 standard GPS / 2 differential GPS / 3 estimated (DR) fix
 
         self.speed_ = 0  # speed over ground km/h
@@ -65,15 +66,18 @@ class Gps:
     @property
     def date(self):
         # date in day, month, year format ddmmyy es. 091219
-        self.date_ = "000000" if self.date_ == 0 else str(self.date_)
+        self.date_ = "010100" if self.date_ == 0 else str(self.date_)
         p_day = self.date_[0:2]
         p_month = self.date_[2:4]
         p_year = self.date_[4:6]
-        return '{}-{}-{}'.format(p_day, p_month, p_year)
+        return '{}-{}-{}'.format(p_year, p_month, p_day)
 
     @property
     def timestamp(self):
-        return '{} {}'.format(self.date, self.time)
+        timestamp = '{} {}'.format(self.date, self.time)
+        utc = datetime.strptime(timestamp, '%y-%m-%d %H:%M:%S')
+        # timestamp_f = utc + self.timezone_offset
+        return utc
 
     def distance(self, latitude: float, longitude: float):
         position_distance = (latitude, longitude)

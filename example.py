@@ -1,4 +1,4 @@
-from gps import Gps
+from steGPS.gps import Gps
 from time import sleep
 
 

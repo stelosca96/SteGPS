@@ -1,11 +1,16 @@
 import setuptools
+import re
 
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+with open('steGPS/__init__.py', 'r') as f:
+    version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]',
+                        f.read(), re.MULTILINE).group(1)
+
 setuptools.setup(
     name='SteGPS',
-    version=0.1,
+    version=version,
     author='Stefano Loscalzo',
     author_email='stefano.loscalzo@gmail,com',
     description='BN-200 GPS python library',
