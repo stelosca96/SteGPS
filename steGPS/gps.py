@@ -9,9 +9,10 @@ from datetime import datetime, timedelta
 
 class Gps:
 
-    def __init__(self, serial_port: str, timezone_hours: int = 0, serial_baudrate: int = 9600):
+    def __init__(self, serial_port: str, timezone_hours: int = 0, serial_baudrate: int = 9600, round_number: int = 2):
         self.__serial = serial.Serial(serial_port, serial_baudrate)
         # self.file = open("aaa.txt", "a+")
+        self._round_number = round_number
         self.__timezone_offset = timedelta(hours=timezone_hours)
         self.__quality = 0  # 0 not fixed / 1 standard GPS / 2 differential GPS / 3 estimated (DR) fix
 
@@ -50,7 +51,7 @@ class Gps:
 
     @property
     def speed(self):
-        return self.__speed
+        return round(float(self.__speed), self._round_number)
 
     @property
     def satellites(self):
@@ -60,8 +61,8 @@ class Gps:
     def time(self):
         # UTC time hhmmss.ss
         p_hours = str(self.__time)[0:2]
-        p_minutes = str(self.__time)[2:4]
-        p_seconds = str(self.__time)[4:6]
+        p_minutes = str(self.__time)[2:4] if isinstance(self.__time, str) else "00"
+        p_seconds = str(self.__time)[4:6] if isinstance(self.__time, str) else "00"
         return '{}:{}:{}'.format(p_hours, p_minutes, p_seconds)
 
     @property
@@ -82,11 +83,11 @@ class Gps:
 
     def distance(self, latitude: float, longitude: float):
         position_distance = (latitude, longitude)
-        return haversine(self.position, position_distance)
+        return round(haversine(self.position, position_distance), self._round_number)
 
     @property
     def travelled_distance(self):
-        return self.__travelled_distance
+        return round(self.__travelled_distance, self._round_number)
 
     def _run(self):
         last_print = time.monotonic()
