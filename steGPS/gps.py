@@ -39,23 +39,28 @@ class Gps:
 
     @property
     def altitude(self):
-        return self.__altitude
+        altitude = safe_cast(self.__altitude, float, .0)
+        return altitude
 
     @property
     def latitude(self):
-        return self.__latitude
+        latitude = safe_cast(self.__latitude, float, .0)
+        return latitude
 
     @property
     def longitude(self):
-        return self.__longitude
+        longitude = safe_cast(self.__longitude, float, .0)
+        return longitude
 
     @property
     def speed(self):
-        return round(float(self.__speed), self._round_number)
+        speed = safe_cast(self.__speed, float, .0)
+        return round(speed, self._round_number)
 
     @property
     def satellites(self):
-        return self.__satellites
+        satellites = safe_cast(self.__satellites, int, 0)
+        return satellites
 
     @property
     def time(self):
@@ -117,25 +122,22 @@ class Gps:
         if line.__len__() < 15:
             return
         self.__time = line[1]
-        if self.__latitude != '' and self.__longitude != '':
-            self.nmea_cord_to_decimal(line[3], line[5])
-            self.add_distance(self.latitude, self.longitude)
-        self.__quality = int(line[6])
-        self.__satellites = int(line[7])
-        self.__altitude = float(line[9])
+        self.nmea_cord_to_decimal(line[3], line[5])
+        self.add_distance(self.latitude, self.longitude)
+        self.__quality = line[6]
+        self.__satellites = line[7]
+        self.__altitude = line[9]
 
     def parse_xxGLL(self, line):
         if line.__len__() < 8:
             return
-        if self.__latitude != '' and self.__longitude != '':
-            self.nmea_cord_to_decimal(line[1], line[3])
+        self.nmea_cord_to_decimal(line[1], line[3])
 
     def parse_xxRMC(self, line):
         if line.__len__() < 13:
             return
         self.__time = line[1]
-        if self.__latitude != '' and self.__longitude != '':
-            self.nmea_cord_to_decimal(line[3], line[5])
+        self.nmea_cord_to_decimal(line[3], line[5])
         self.__date = line[9]
 
     def parse_xxVTG(self, line):
@@ -148,15 +150,23 @@ class Gps:
         self.__travelled_distance = value
 
     def add_distance(self, latitude, longitude):
-        pos_1 = (latitude, longitude)
-        if longitude != '' and latitude != '' and self.__pos_0[0] != '' and self.__pos_0[1] != '':
-            d = haversine(self.__pos_0, pos_1)
-            if d > 1:
-                self.__travelled_distance += d
-        self.__pos_0 = pos_1
+        if self.fixed:
+            pos_1 = (latitude, longitude)
+            if longitude != '' and latitude != '' and self.__pos_0[0] != '' and self.__pos_0[1] != '':
+                d = haversine(self.__pos_0, pos_1)
+                if d > 1:
+                    self.__travelled_distance += d
+            self.__pos_0 = pos_1
 
     def nmea_cord_to_decimal(self, latitude, longitude):
         if not re.match("[0-9]{4}.[0-9]+", latitude) or not re.match("[0-9]{5}.[0-9]+", longitude):
             return
         self.__latitude = float(latitude[0:2]) + float(latitude[2:])/60
         self.__longitude = float(longitude[0:3]) + float(longitude[3:])/60
+
+
+def safe_cast(val, to_type, default=None):
+    try:
+        return to_type(val)
+    except (ValueError, TypeError):
+        return default
