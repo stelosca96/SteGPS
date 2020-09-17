@@ -81,10 +81,11 @@ class Gps:
 
     @property
     def timestamp(self):
-        timestamp = '{} {}'.format(self.date, self.time)
-        utc = datetime.strptime(timestamp, '%y-%m-%d %H:%M:%S')
+        # timestamp = '{} {}'.format(self.date, self.time)
+        # utc = datetime.strptime(timestamp, '%y-%m-%d %H:%M:%S')
         # timestamp_f = utc + self.timezone_offset
-        return utc
+        return '{} {}'.format(self.date, self.time)
+
 
     def distance(self, latitude: float, longitude: float):
         position_distance = (latitude, longitude)
