@@ -77,7 +77,7 @@ class Gps:
         p_day = self.__date[0:2]
         p_month = self.__date[2:4]
         p_year = self.__date[4:6]
-        return '{}-{}-{}'.format(p_year, p_month, p_day)
+        return '20{}-{}-{}'.format(p_year, p_month, p_day)
 
     @property
     def timestamp(self):
@@ -85,7 +85,6 @@ class Gps:
         # utc = datetime.strptime(timestamp, '%y-%m-%d %H:%M:%S')
         # timestamp_f = utc + self.timezone_offset
         return '{} {}'.format(self.date, self.time)
-
 
     def distance(self, latitude: float, longitude: float):
         position_distance = (latitude, longitude)
