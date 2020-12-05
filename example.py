@@ -9,7 +9,7 @@ def print_gps():
     print("\n---------------------------------")
     print("Satellites: ", gps.satellites)
     print("Timestamp: ", gps.timestamp)
-    print("Time: ", gps.message_time)
+    # print("Time: ", gps.message_time)
     print("Date: ", gps.date)
     print("Position: ", gps.position)
     print("Latitude: ", gps.latitude, "°")
